@@ -1,0 +1,19 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model StreamViewModel
+
+<h1>Stream Details :</h1>
+<hr />
+<div>
+    <h4>Degree Name: @Model.Degree.DegreeName</h4>
+    <h4>Degree Description: @Model.Degree.DegreeDescription</h4>
+    <h4>Stream Name: @Model.StreamName</h4>
+    <h4>Stream Description: @Model.StreamDescription</h4>
+    
+
+</div>
+<hr />
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.StreamId" class="btn btn-primary">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.StreamId" class="btn btn-danger">Delete</a>
+    <a asp-action="Index" asp-route-id="@Model.StreamId" class="btn btn-secondary">Back to List</a>
+</p>

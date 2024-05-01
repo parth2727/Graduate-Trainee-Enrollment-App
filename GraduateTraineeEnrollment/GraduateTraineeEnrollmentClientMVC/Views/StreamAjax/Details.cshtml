@@ -1,0 +1,91 @@
+﻿<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+<h1>Stream Details :</h1>
+
+<div>
+    <h4>Degree Name: <lable id="degreeName"></lable> </h4>
+    <h4>Degree Description: <lable id="degreeDescription"></lable></h4>
+    <h4>Stream Name: <lable id="streamName"></lable> </h4>
+    <h4>Stream Description: <lable id="streamDescription"></lable></h4>
+
+</div>
+
+<p>
+    @* <a asp-action="Edit"  class="btn btn-primary">Edit</a>
+    <a asp-action="Delete"  class="btn btn-danger">Delete</a> *@
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+</p>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        GetStreamById();
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    function GetStreamById() {
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        var currentUrl = window.location.href;
+        var id = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+        $.ajax({
+            url: "http://localhost:5220/api/Stream/GetStreamById/" + id,
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+
+                    $('#degreeName').html(response.data.degree.degreeName);
+                    $('#degreeDescription').html(response.data.degree.degreeDescription);
+                    $('#streamName').html(response.data.streamName);
+                    $('#streamDescription').html(response.data.streamDescription);
+                }
+            },
+            error: function (xhr, status, error) {
+                // Check if there is a responseText available
+                if (xhr.responseText) {
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+                        }
+
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+</script>

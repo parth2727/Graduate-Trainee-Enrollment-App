@@ -1,0 +1,22 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model StreamViewModel
+
+<h1>Delete Stream : </h1>
+<hr />
+<div>
+    <h2>Are you sure you want to delete this category ?</h2>
+    <hr />
+    <h4>Degree Name: @Model.Degree.DegreeName</h4>
+    <h4>Degree Description: @Model.Degree.DegreeDescription</h4>
+    <h4>Stream Name: @Model.StreamName</h4>
+    <h4>Stream Description: @Model.StreamDescription</h4>
+    
+    <hr />
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="StreamId" />
+        <div class="form-group">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>

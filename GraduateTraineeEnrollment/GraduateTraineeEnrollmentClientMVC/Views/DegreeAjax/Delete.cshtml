@@ -1,0 +1,203 @@
+﻿<h1>Delete Degree</h1>
+<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+<div>
+    <h4>Are you sure you want to delete this degree?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Name :
+        </dt>
+        <dd class="col-sm-10">
+            <lable id="degreeName"></lable>
+        </dd>
+        <dt class="col-sm-2">
+            Description :
+        </dt>
+        <dd class="col-sm-10">
+            <lable id="degreeDescription"></lable>
+        </dd>
+    </dl>
+    <form id="deleteConfirmed">
+        <input type="hidden" id="degreeId" />
+        <div class="form-group">
+            <input type="submit" value="Delete" class="btn btn-danger" />|
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        GetDegreeDetails();
+
+        $('#deleteConfirmed').submit(function (e) {
+            e.preventDefault();
+            DeleteDegree();
+        });
+
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    function DeleteDegree() {
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+
+        // alert('Degree details');
+        var currentUrl = window.location.href;
+        var id = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+        $('#loader').show();
+        // alert('I got the id' + id);
+        let degreeId = $('#degreeId').val().trim();
+
+        $('#loader').show();
+
+        $.ajax({
+            url: "http://localhost:5220/api/Degree/RemoveDegree/" + id,
+            type: 'DELETE',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+                    ShowMessage(response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                // alert("Ohh, I got the error");
+                // alert(error);
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+
+
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+
+    function GetDegreeDetails() {
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        // alert('Degree details');
+        var currentUrl = window.location.href;
+        var id = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+        // alert('I got the id' + id);
+
+        $.ajax({
+            url: "http://localhost:5220/api/Degree/GetDegreeById/" + id,
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+                    $('#degreeName').html(response.data.degreeName);
+                    $('#degreeDescription').html(response.data.degreeDescription);
+                }
+            },
+            error: function (xhr, status, error) {
+                // alert("Ohh, I got the error");
+                // alert(error);
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+
+
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+
+        });
+    }
+
+    function ShowMessage(message) {
+        // Get the message container
+        var messageContainer = document.getElementById('messageContainer');
+
+        // Display success message
+        messageContainer.textContent = message;
+        messageContainer.style.backgroundColor = '#4CAF50';
+        messageContainer.style.opacity = '1';
+
+        // Hide the message after 3 seconds (3000 milliseconds)
+        setTimeout(function () {
+            messageContainer.style.opacity = '0';
+        }, 3000);
+
+        // Redirect to index page after a short delay (optional)
+        setTimeout(function () {
+            window.location.href = '/DegreeAjax/Index';
+        }, 1000); // Redirect after 1 seconds (1000 milliseconds)
+    }
+
+</script>

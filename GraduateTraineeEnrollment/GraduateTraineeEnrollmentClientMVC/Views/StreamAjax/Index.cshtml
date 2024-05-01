@@ -1,0 +1,107 @@
+﻿<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+<h1>Streams Ajax: </h1>
+<table class="table" id="streamData">
+    <thead>
+        <tr>
+
+            <th>Degree Name: </th>
+            <th>Degree Description: </th>
+            <th>Stream Name: </th>
+            <th>Stream Description: </th>
+            <th>Action</th>
+
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<a asp-action="Create" asp-controller="StreamAjax" class="btn btn-success">Add</a>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        LoadStreams();
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    function LoadStreams() {
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        $.ajax({
+            url: "http://localhost:5220/api/Stream/GetAllStream",
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+                    response.data.forEach(function (degree) {
+                        $('#streamData tbody').append(`
+                            <tr>
+                                 <td>${degree.degree.degreeName}</td>
+                                 <td>${degree.degree.degreeDescription}</td>
+                                 <td>${degree.streamName}</td>
+                                 <td>${degree.streamDescription}</td>
+                                 <td>
+                                    <a class="btn btn-primary" href="/StreamAjax/Edit/${degree.streamId}">Edit<a/>
+                                    <a class="btn btn-warning" href="/StreamAjax/Details/${degree.streamId}">Details<a/>
+                                    <a class="btn btn-danger" href="/StreamAjax/Delete/${degree.streamId}">Delete<a/>
+                                 </td>
+
+                            </tr>
+                        `)
+                    })
+                }
+            },
+            error: function (xhr, status, error) {
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+
+
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+</script>

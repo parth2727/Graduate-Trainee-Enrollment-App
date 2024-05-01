@@ -1,0 +1,26 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model List<EnrollmentReportViewModel>
+
+<h1>Enrollment Report :</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Degree Name : </th>
+            <th>Stream Name : </th>
+            <th>Total Trainee Count : </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var gt in Model)
+        {
+            <tr>
+                <td>@gt.DegreeName</td>
+                <td>@gt.StreamName</td>
+                <td>@gt.TotalTraineeCount</td>
+
+            </tr>
+        }
+
+    </tbody>
+</table>

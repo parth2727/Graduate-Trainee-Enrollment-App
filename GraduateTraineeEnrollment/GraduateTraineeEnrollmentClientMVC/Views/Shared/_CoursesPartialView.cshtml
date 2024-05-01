@@ -1,0 +1,15 @@
+﻿
+@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model AddGraduateTraineeViewModel
+
+<div class="form-group">
+    <label asp-for="StreamId">Select Course:</label>
+    <select asp-for="StreamId" class="form-control">
+        <option value="">-- Select Course --</option>
+        @foreach (var course in Model.streams)
+        {
+            <option value="@course.StreamId">@course.StreamName</option>
+        }
+    </select>
+
+</div>

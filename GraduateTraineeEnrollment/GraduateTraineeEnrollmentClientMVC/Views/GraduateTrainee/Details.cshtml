@@ -1,0 +1,37 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model UpdateTraineeViewModel
+
+<h1>Graduate Trainees : </h1>
+<hr />
+<div>
+    <h4>Trainee @Model.GraduateTraineeId</h4>
+    <td>
+        <img src="@Url.Content("~/Uploads/" +@Model.Image)" alt="Trainee img" width="50" height="50" />
+    </td>
+
+    <h4>Trainee Name : @Model.TraineeName</h4>
+    <h4>Trainee Email : @Model.TraineeEmail</h4>
+    <h4>University : @Model.UniversityName</h4>
+    <h4>
+        Last Semester :
+        @if (Model.IsLastSemesterPending)
+        {
+            <td>Pending</td>
+        }
+        else
+        {
+            <td>Not Pending</td>
+        }
+
+    </h4>
+    <h4>Gender : @Model.Gender</h4>
+    <h4>Date of Application : @Model.DateOfApplication</h4>
+    
+
+</div>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.GraduateTraineeId" class="btn btn-primary">Edit</a>
+    <a asp-action="Create" asp-route-id="@Model.GraduateTraineeId" class="btn btn-success">Add</a>
+    <a asp-action="Index" asp-route-id="@Model.GraduateTraineeId" class="btn btn-secondary">Back to List</a>
+</p>

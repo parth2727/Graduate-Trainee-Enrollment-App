@@ -1,0 +1,132 @@
+﻿<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+<h1>Stream Details :</h1>
+<hr />
+<div>
+    <h4>Trainee Name: <lable id="traineeName"></lable> </h4>
+    <h4>Degree Name: <lable id="degreeName"></lable></h4>
+    <h4>Stream Name: <lable id="streamName"></lable> </h4>
+    <h4>Trainee Email: <lable id="traineeEmail"></lable> </h4>
+    <h4>University Name: <lable id="universityName"></lable> </h4>
+    <h4>Last Semester : <lable id="isLastSemesterPending"></lable> </h4>
+    <h4>Gender : <lable id="gender"></lable> </h4>
+    <h4>DateOfApplication: <lable id="dateOfApplication"></lable></h4>
+    <h4>Ai : <lable id="ai"></lable> </h4>
+    <h4>Phyton : <lable id="phyton"></lable> </h4>
+    <h4>BusinessAnalysis : <lable id="businessAnalysis"></lable> </h4>
+    <h4>MachineLearning : <lable id="machineLearning"></lable> </h4>
+    <h4>Practical : <lable id="practical"></lable> </h4>
+    <h4>TotalMarks : <lable id="totalMarks"></lable> </h4>
+    <h4>Percentages : <lable id="percentages"></lable> </h4>
+    <h4>Admission Confirmation : <lable id="isAdmissionConfirmed"></lable> </h4>
+
+
+</div>
+<hr />
+<p>
+    @* <a asp-action="Edit"  class="btn btn-primary">Edit</a>
+    <a asp-action="Delete"  class="btn btn-danger">Delete</a> *@
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+</p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        
+        GetTraineeById();
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    function GetTraineeById(){
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        var currentUrl = window.location.href;
+        var id = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+        $.ajax({
+            url: "http://localhost:5220/api/GraduateTrainee/GetById/" + id,
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+
+                    $('#traineeName').html(response.data.traineeName);
+                    $('#degreeName').html(response.data.degree.degreeName);
+                    $('#streamName').html(response.data.stream.streamName);
+                    $('#traineeEmail').html(response.data.traineeEmail);
+                    $('#universityName').html(response.data.universityName);
+                    $('#isLastSemesterPending').html(response.data.isLastSemesterPending);
+                    if (response.data.isLastSemesterPending == "true"){
+                        $('#isLastSemesterPending').html("Pending");
+                    }
+                    else{
+                        $('#isLastSemesterPending').html("Not Pending");
+                    }
+                    $('#gender').html(response.data.gender);
+                    $('#dateOfApplication').html(response.data.dateOfApplication);
+                    $('#ai').html(response.data.ai);
+                    $('#phyton').html(response.data.phyton);
+                    $('#businessAnalysis').html(response.data.businessAnalysis);
+                    $('#machineLearning').html(response.data.machineLearning);
+                    $('#practical').html(response.data.practical);
+                    $('#totalMarks').html(response.data.totalMarks);
+                    $('#percentages').html(response.data.percentages);
+                    $('#isAdmissionConfirmed').html(response.data.isAdmissionConfirmed);
+                    if (response.data.isAdmissionConfirmed == "true") {
+                        $('#isAdmissionConfirmed').html("Confirmed");
+                    }
+                    else {
+                        $('#isAdmissionConfirmed').html("Not Confirmed");
+                    }
+
+                }
+            },
+            error: function (xhr, status, error) {
+                // Check if there is a responseText available
+                if (xhr.responseText) {
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+                        }
+
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+</script>
+

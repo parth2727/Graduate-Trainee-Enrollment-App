@@ -1,0 +1,39 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model List<StreamViewModel> 
+
+    <h1>Streams:</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            
+            <th>Degree Name: </th>
+            <th>Degree Description: </th>
+            <th>Stream Name: </th>
+            <th>Stream Description: </th>
+            <th>Actions:</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var s in Model)
+        {
+            <tr>
+                
+                <td>@s.Degree.DegreeName</td>
+                <td>@s.Degree.DegreeDescription</td>
+                <td>@s.StreamName</td>
+                <td>@s.StreamDescription</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@s.StreamId" class="btn btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@s.StreamId" class="btn btn-warning">Details</a>
+                    <a asp-action="Delete" asp-route-id="@s.StreamId" class="btn btn-danger">Delete</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">Add</a>

@@ -1,0 +1,309 @@
+﻿<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+
+<h1>Edit Stream: </h1>
+
+<div id="validationSummary" class="text-danger" style="display:none;">
+</div>
+
+<form id="streamEditForm">
+    <input type="hidden" id="StreamId" />
+    <div class="form-group">
+        <label for="DegreeId">Degrees:</label>
+        <select id="DegreeId" name="DegreeId" class="form-control">
+            <option value="">--Select Degree--</option>
+            <!-- States will be populated dynamically via AJAX -->
+        </select>
+    </div>
+    @* <div class="form-group">
+        <label for="StreamId">Streams:</label>
+        <select id="StreamId" name="StreamId" class="form-control">
+            <option value="">--Select Streams--</option>
+            <!-- States will be populated dynamically via AJAX -->
+        </select>
+    </div> *@
+    <div class="form-group">
+        <label for="StreamName" class="control-label">Stream Name</label>
+        <input id="StreamName" class="form-control" />
+        <span validation-for="StreamName" class="text-danger"></span>
+    </div>
+    
+    <div class="form-group">
+        <label for="StreamDescription" class="control-label">Stream Description</label>
+        <input id="StreamDescription" class="form-control" />
+        <span validation-for="StreamDescription" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Submit" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-danger">Cancel</a>
+    </div>
+
+
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        LoadDegrees(); 
+        
+        GetStreams();
+
+        $('#streamEditForm').submit(function (e) {
+            e.preventDefault()
+
+            if (ValidateStreamForm()) {
+                $('#loader').show()
+                ModifyStream();
+            }
+        });
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+
+    function ModifyStream(){
+
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        let degreeId = $("#DegreeId").val().trim();
+        let streamId = $("#StreamId").val().trim();
+        let streamName = $('#StreamName').val().trim();
+        let streamDescription = $('#StreamDescription').val().trim();
+
+        var requestData = {
+            degreeId: degreeId,
+            streamId:streamId,
+            streamName: streamName,
+            streamDescription: streamDescription
+        }
+        
+        $.ajax({
+            url: "http://localhost:5220/api/Stream/ModifyStream",
+            type: "PUT",
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                ShowMessage(response.message);
+
+            },
+            error: function (xhr, status, error) {
+                // Check if there is a responseText available
+                if (xhr.responseText) {
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again.');
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again.');
+                    }
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again.');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+
+    
+
+    function LoadDegrees(){
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        $.ajax({
+            url: "http://localhost:5220/api/Degree/GetAllDegrees",
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+                    $.each(response.data, function (key, value) { //response was passing...
+                        var degreeId = value.degreeId;
+                        var degreeName = value.degreeName;
+                        $("#DegreeId").append($("<option value=" + degreeId + ">" + degreeName + "</option>")
+                        );
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+
+        });
+    }
+
+    function GetStreams(){
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            // Redirect to login page if jwtToken cookie is not available
+            window.location.href = '/auth/login';
+            return; // Stop further execution
+        }
+        $('#loader').show();
+        // alert('Category details');
+        var currentUrl = window.location.href;
+        var id = currentUrl.substring(currentUrl.lastIndexOf('/') + 1);
+        // alert('I got the id' + id);
+
+        $.ajax({
+            url: "http://localhost:5220/api/Stream/GetStreamById/" + id,
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+
+                    $('#DegreeId').val(response.data.degreeId);
+                    $('#StreamId').val(response.data.streamId);
+                    $('#StreamName').val(response.data.streamName);
+                    $('#StreamDescription').val(response.data.streamDescription);
+                }
+            },
+            error: function (xhr, status, error) {
+                // alert("Ohh, I got the error");
+                // alert(error);
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+
+
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+
+        });
+    }
+
+    function ValidateStreamForm() {
+        let degreeId = $('#DegreeId').val().trim();
+        let streamName = $('#StreamName').val().trim();
+        let streamDescription = $('#StreamDescription').val().trim();
+        $('#validationSummary').empty().hide();
+        let isValid = true;
+        if (degreeId.length === 0) {
+            $('#validationSummary').append('<p>Degree is required.</p>')
+            isValid = false;
+        }
+        if (streamName.length === 0) {
+            $('#validationSummary').append('<p>Stream name is required.</p>')
+            isValid = false;
+        }
+        if (streamDescription.length === 0) {
+            $('#validationSummary').append('<p>Stream description is required.</p>')
+            isValid = false;
+        }
+
+        if (!isValid) {
+            $('#validationSummary').show();
+        }
+
+        return isValid;
+    }
+
+    function ShowMessage(message) {
+        // Get the message container
+        var messageContainer = document.getElementById('messageContainer');
+
+        // Display success message
+        messageContainer.textContent = message;
+        messageContainer.style.backgroundColor = '#4CAF50';
+        messageContainer.style.opacity = '1';
+
+        // Hide the message after 3 seconds (3000 milliseconds)
+        setTimeout(function () {
+            messageContainer.style.opacity = '0';
+        }, 3000);
+
+        // Redirect to index page after a short delay (optional)
+        setTimeout(function () {
+            window.location.href = '/StreamAjax/Index';
+        }, 1000); // Redirect after 3.5 seconds (3500 milliseconds)
+    }
+
+</script>

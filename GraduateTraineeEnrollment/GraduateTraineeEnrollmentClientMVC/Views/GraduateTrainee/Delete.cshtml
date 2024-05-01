@@ -1,0 +1,40 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model UpdateTraineeViewModel
+
+<h1>Delete Trainee : </h1>
+<hr />
+<div>
+    <h2>Are you sure you want to delete this Trainee ?</h2>
+    <hr />
+    <h4>Trainee @Model.GraduateTraineeId</h4>
+    <td>
+        <img src="@Url.Content("~/Uploads/" +@Model.Image)" alt="Trainee img" width="50" height="50" />
+    </td>
+
+    <h4>Trainee Name : @Model.TraineeName</h4>
+    <h4>Trainee Email : @Model.TraineeEmail</h4>
+    <h4>University : @Model.UniversityName</h4>
+    <h4>
+        Last Semester :
+        @if (Model.IsLastSemesterPending)
+        {
+            <td>Pending</td>
+        }
+        else
+        {
+            <td>Not Pending</td>
+        }
+
+    </h4>
+    <h4>Gender : @Model.Gender</h4>
+    <h4>Date of Application : @Model.DateOfApplication</h4>
+
+    <hr />
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="GraduateTraineeId" />
+        <div class="form-group">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>

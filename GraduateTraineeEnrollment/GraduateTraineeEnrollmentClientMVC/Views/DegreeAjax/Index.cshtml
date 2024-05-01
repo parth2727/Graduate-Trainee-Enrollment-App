@@ -1,0 +1,115 @@
+﻿<div id="loader" style="display:none;">
+    <img src="~/imgs/loadingimg.gif" />
+</div>
+
+<h1>Degrees Ajax:</h1>
+
+<table id="degreeGrid" class="table">
+    <thead>
+        <tr>
+            
+            <th>Degree Name:</th>
+            <th>Degree Description:</th>
+            <th>Actions:</th>
+            
+        </tr>
+    </thead>
+
+    <tbody>
+        @* Grid Will populated dynamically *@
+    </tbody>
+
+</table>
+
+<a asp-action="Create" class="btn btn-success">Add</a>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        LoadDegrees();
+    });
+
+    function getCookie(name) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(cookie => cookie.startsWith(name + '='))
+            ?.split('=')[1];
+        return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    function LoadDegrees(){
+        const jwtToken = getCookie('jwtToken');
+        if (!jwtToken) {
+            //redirect to the login page if cookie not available
+            window.location.href = '/auth/login';
+            return;//stop further execution
+        }
+        $('#loader').show();
+
+        $.ajax({
+            url: "http://localhost:5220/api/Degree/GetAllDegrees",
+            type: 'GET',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken
+            },
+            success: function (response) {
+                if (response.success) {
+                    // alert("Yea, I got response.")
+                    response.data.forEach(function (degree) {
+                        $('#degreeGrid tbody').append(`
+                                    <tr>  
+                                        
+                                        <td>${degree.degreeName}</td>
+                                        <td>${degree.degreeDescription}</td>
+                                            <td>
+                                                <a href="/DegreeAjax/Edit/${degree.degreeId}" class="btn btn-primary">Edit</a>
+                                                        <a href="/DegreeAjax/Details/${degree.degreeId}" class="btn btn-warning">Details</a>
+                                                            <a href="/DegreeAjax/Delete/${degree.degreeId}" class="btn btn-danger">Delete</a>
+                                        </td>
+                                        
+                                    </tr>
+                        `)
+                    })
+                }
+            },
+            error: function (xhr, status, error) {
+                // alert("Ohh, I got the error");
+                // alert(error);
+                if (xhr.responseText) {
+
+                    try {
+                        // Parse the responseText into a JavaScript object
+                        var errorResponse = JSON.parse(xhr.responseText);
+
+                        // Check the properties of the errorResponse object
+                        if (errorResponse && errorResponse.message) {
+                            // Display the error message to the user
+                            alert('Error: ' + errorResponse.message);
+                        } else {
+                            // Display a generic error message
+                            alert('An error occurred. Please try again. ');
+
+                        }
+                    }
+
+
+                    catch (parseError) {
+                        console.error('Error parsing response:', parseError);
+                        alert('An error occurred. Please try again. ');
+                    }
+
+                } else {
+                    // Display a generic error message if no responseText is available
+                    alert('An unexpected error occurred. Please try again. ');
+                }
+            },
+            complete: function () {
+                $('#loader').hide();
+            }
+        });
+    }
+
+</script>
+

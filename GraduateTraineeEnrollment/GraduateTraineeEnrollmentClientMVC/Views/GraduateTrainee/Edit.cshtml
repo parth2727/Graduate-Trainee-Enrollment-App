@@ -1,0 +1,151 @@
+﻿
+@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model UpdateTraineeViewModel
+
+<h1>Edit Graduate Trainee:</h1>
+<form id="gradeForm" asp-action="Edit" method="post">
+    <input type="hidden" asp-for="GraduateTraineeId" />
+    <div class="form-group">
+        <label asp-for="DegreeId">Select Degree:</label>
+        <select id="DegreeDropdown" asp-for="DegreeId" class="form-control">
+            @foreach (var student in Model.degrees)
+            {
+                if (student.DegreeId == Model.DegreeId)
+                {
+                    <option value="@student.DegreeId">@student.DegreeName </option>
+                    break;
+                }
+            }
+            @foreach (var student in Model.degrees)
+            {
+                if (student.DegreeId != Model.DegreeId)
+                {
+                    <option value="@student.DegreeId">@student.DegreeName </option>
+                }
+            }
+        </select>
+
+    </div>
+
+    <div id="StreamContainer">
+        <!-- Streams dropdown will be filled dynamically -->
+        <div class="form-group">
+            <label asp-for="StreamId">Select Stream:</label>
+            <select asp-for="StreamId" class="form-control">
+                
+                @foreach (var student in Model.streams)
+                {
+                    if (student.StreamId == Model.StreamId && student.DegreeId == Model.DegreeId)
+                    {
+                        <option value="@student.StreamId">@student.StreamName </option>
+                    }
+
+
+                }
+                @foreach (var student in Model.streams)
+                {
+                    if (student.StreamId != Model.StreamId && student.DegreeId == Model.DegreeId)
+                    {
+                        <option value="@student.StreamId">@student.StreamName </option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TraineeName" class="control-label"></label>
+        <input asp-for="TraineeName" class="form-control" />
+        <span asp-validation-for="TraineeName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TraineeEmail" class="control-label"></label>
+        <input asp-for="TraineeEmail" class="form-control" />
+        <span asp-validation-for="TraineeEmail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="UniversityName" class="control-label"></label>
+        <input asp-for="UniversityName" class="form-control" />
+        <span asp-validation-for="UniversityName" class="text-danger"></span>
+    </div>
+    <br />
+    <div class="form-group">
+        <label asp-for="IsLastSemesterPending" class="control-label"></label>
+        <input asp-for="IsLastSemesterPending" type="checkbox" />
+        <span asp-validation-for="IsLastSemesterPending" class="text-danger"></span>
+    </div>
+    <br />
+    <div class="form-group">
+        <label asp-for="Gender" class="control-label">Gender:</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Gender" value="M" id="GenderTrue" />
+            <label class="form-check-label" for="Gender">Male</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" asp-for="Gender" value="F" id="GenderFalse" />
+            <label class="form-check-label" for="Gender">Female</label>
+        </div>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="DateOfApplication" class="control-label"></label>
+        <input asp-for="DateOfApplication" class="form-control" />
+        <span asp-validation-for="DateOfApplication" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Image" class="control-label"></label>
+        <input asp-for="Image" type="datetime" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Ai" class="control-label">Ai Marks</label>
+        <input asp-for="Ai" class="form-control" />
+        <span asp-validation-for="Ai" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phyton" class="control-label">Phyton Marks</label>
+        <input asp-for="Phyton" class="form-control" />
+        <span asp-validation-for="Phyton" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BusinessAnalysis" class="control-label">BusinessAnalysis Marks</label>
+        <input asp-for="BusinessAnalysis" class="form-control" />
+        <span asp-validation-for="BusinessAnalysis" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MachineLearning" class="control-label">MachineLearning Marks</label>
+        <input asp-for="MachineLearning" class="form-control" />
+        <span asp-validation-for="MachineLearning" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Practical" class="control-label">Practical Marks</label>
+        <input asp-for="Practical" class="form-control" />
+        <span asp-validation-for="Practical" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Edit" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-danger">Cancel</a>
+    </div>
+
+</form>
+
+<script>
+    document.getElementById('DegreeDropdown').addEventListener('change', function () {
+        var selectedDegreeId = this.value;
+        if (selectedDegreeId !== '') {
+            $.ajax({
+                url: 'http://localhost:5220/api/Steam/GetAllStream', // Endpoint to your controller action
+                type: 'POST',
+                data: { studentId: selectedDegreeId },
+                success: function (response) {
+                    $('#StreamContainer').html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        } else {
+            $('#StreamContainer').html(''); // Clear stream dropdown if no degree selected
+        }
+    });
+</script>

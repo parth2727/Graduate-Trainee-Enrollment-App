@@ -1,0 +1,60 @@
+﻿@using GraduateTraineeEnrollmentClientMVC.ViewModel
+@model List<GraduateTraineeViewModel>
+
+<h1>Graduate Trainee:</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>Trainee Name: </th>
+            <th>Degree Id:</th>
+            <th>Stream Id:</th>
+            @* <th>Degree Name: </th> *@
+            @* <th>Stream Name: </th> *@
+            <th>Trainee Email: </th>
+            <th>University Name: </th>
+            <th>Last Semester Penting: </th>
+            <th>Gender </th>
+            <th>Date of Application: </th>
+            <th>Actions:</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var gt in Model)
+        {
+            <tr>
+
+                <td>@gt.TraineeName</td>
+                <td>@gt.DegreeId</td>
+                <td>@gt.StreamId</td>
+                @* <td>@gt.StreamDegree.DegreeName</td> *@
+                @* <td>@gt.StreamDegree.StreamName</td> *@
+                <td>@gt.TraineeEmail</td>
+                <td>@gt.UniversityName</td>
+                @if (gt.IsLastSemesterPending)
+                {
+                    <td>Pending </td>
+                }
+                else
+                {
+                    <td>Not Pending</td>
+                }
+                <td>@gt.Gender</td>
+                <td>@gt.DateOfApplication</td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@gt.GraduateTraineeId" class="btn btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@gt.GraduateTraineeId" class="btn btn-warning">Details</a>
+                    <a asp-action="Delete" asp-route-id="@gt.GraduateTraineeId" class="btn btn-danger">Delete</a>
+                    
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">Add</a>
